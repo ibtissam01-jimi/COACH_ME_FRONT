@@ -310,11 +310,42 @@ class UserController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * Permet de supprimer un ou plusieurs utilisateurs
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, string $id = null)
     {
-        $ids = $request->input('ids');
-        User::whereIn('id', $ids)->delete();
-        return response()->json(['message' => 'Employés supprimés']);
+        if (!auth()->user()->hasRole('admin')) {
+            return response()->json(['message' => 'Vous n\'avez pas l\'autorisation de supprimer des utilisateurs'], 403);
+        }
+
+        // Si on reçoit des IDs dans le corps de la requête
+        $ids = $request->input('ids', []);
+        if (!empty($ids)) {
+            $users = User::whereIn('id', $ids)->get();
+        } 
+        // Si on reçoit un ID dans l'URL
+        else if ($id) {
+            $users = collect([User::findOrFail($id)]);
+        } else {
+            return response()->json(['message' => 'Aucun utilisateur spécifié'], 400);
+        }
+
+        $deletedCount = 0;
+        foreach ($users as $user) {
+            
+            if ($user->photo && Storage::disk('public')->exists('profile_picture/' . $user->photo)) {
+                Storage::disk('public')->delete('profile_picture/' . $user->photo);
+            }
+            
+            $user->delete();
+            $deletedCount++;
+        }
+
+        return response()->json([
+            'message' => $deletedCount > 1 ? 
+                        $deletedCount . ' utilisateurs supprimés avec succès' : 
+                        'Utilisateur supprimé avec succès',
+            'count' => $deletedCount
+        ]);
     }
 }
