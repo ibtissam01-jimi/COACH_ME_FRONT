@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 use App\Models\User;
 use App\Models\Administrateur;
 use App\Models\Coach;
-use App\Models\Coachee;
+use App\Models\Coache;
 
 class AuthController extends Controller
 {
@@ -20,7 +20,7 @@ class AuthController extends Controller
             'prenom'  => 'required|string|max:20',
             'email'    => 'required|email|unique:users',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,coach,coachee',
+            'role' => 'required|in:admin,coach,coache',
             'dateNaissance' => 'required|date',
             'telephone' => 'required|string|max:32',
             'adresse' => 'required|string|max:255',
@@ -31,7 +31,7 @@ class AuthController extends Controller
             'dateEmbauche' => 'required_if:role,admin|date',
             'specialite' => 'required_if:role,coach|string|max:100',
             'biographie' => 'required_if:role,coach|string|max:500',
-            'date_debut' => 'required_if:role,coachee|date',
+            'date_debut' => 'required_if:role,coache|date',
         ]);
         
         // Création de l'utilisateur
@@ -52,8 +52,8 @@ class AuthController extends Controller
             case 'coach':
                 Coach::create(['user_id' => $user->id, 'specialite' => $request->specialite, 'biographie' => $request->biographie]);
                 break;
-            case 'coachee':
-                Coachee::create(['user_id' => $user->id, 'date_debut' => $request->date_debut]);
+            case 'coache':
+                Coache::create(['user_id' => $user->id, 'date_debut' => $request->date_debut]);
                 break;
         }
 

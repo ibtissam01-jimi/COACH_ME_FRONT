@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FeedbackController;
+use App\Models\Feedback;
 use App\Models\Administrateur;
 use App\Models\Coach;
 use App\Models\Coache;
@@ -24,6 +26,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users', [UserController::class, 'store']); 
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+    Route::get('/feedbacks', [FeedbackController::class, 'index']);
+    Route::post('/feedbacks', [FeedbackController::class, 'store']);
 });
 
 
