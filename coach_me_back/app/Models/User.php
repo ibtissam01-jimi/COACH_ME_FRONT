@@ -6,11 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -18,10 +20,20 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'email', 'password', 'nom', 'prenom', 'telephone', 'dateNaissance', 'statut','adresse', 'photo', 'genre', 'situation_familliale','role'
     ];
+    public function administrateurs() {
+        return $this->hasMany(Administrateur::class);
+    }
+    public function coaches() {
+        return $this->hasMany(Coach::class);
+    }
+    public function coachees() {
+        return $this->hasMany(Coache::class);
+    }
+    public function feedbacks() {
+        return $this->hasMany(Feedback::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -45,4 +57,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
 }
