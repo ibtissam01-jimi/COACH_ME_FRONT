@@ -11,6 +11,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ObjectifController;
 use App\Http\Controllers\SousObjectifController;
+use App\Http\Controllers\RessourceController;
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\PlanRessourceController;
+use App\Http\Controllers\AbonnementController;
 use App\Models\Feedback;
 use App\Models\Administrateur;
 use App\Models\Coach;
@@ -29,6 +33,34 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/feedbacks', [FeedbackController::class, 'index']);
     Route::post('/feedbacks', [FeedbackController::class, 'store']);
+
+    
+    Route::put('/abonnements/{id}', [AbonnementController::class, 'update']);
+
+    // Routes pour les ressources
+    Route::get('/ressources', [RessourceController::class, 'index']);
+    Route::get('/ressources/{id}', [RessourceController::class, 'show']);
+    Route::post('/ressources/{id}/purchase', [RessourceController::class, 'purchase'])->middleware('role:coache');
+
+    // Routes pour les plans
+    Route::get('/plans', [PlanController::class, 'index']);
+    Route::get('/plans/{id}', [PlanController::class, 'show']);
+
+    // Routes pour la gestion des ressources des plans
+    Route::get('/plans/{planId}/ressources', [PlanRessourceController::class, 'getPlanResources']);
+});
+
+// Routes protégées pour les admins et coachs
+Route::middleware(['auth:sanctum', 'role:admin,coach'])->group(function () {
+    // Gestion des ressources
+    Route::post('/ressources', [RessourceController::class, 'store']);
+    Route::put('/ressources/{id}', [RessourceController::class, 'update']);
+    Route::delete('/ressources', [RessourceController::class, 'destroy']);
+
+    // Gestion des ressources des plans
+    Route::post('/plans/{planId}/ressources', [PlanRessourceController::class, 'attachResources']);
+    Route::delete('/plans/{planId}/ressources', [PlanRessourceController::class, 'detachResources']);
+});
 
     
         // Routes des objectifs
@@ -55,4 +87,9 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
             'permissions' => $user->getAllPermissions(),
         ]);
     });
+
+    // Routes de gestion des plans (admin uniquement)
+    Route::post('/plans', [PlanController::class, 'store']);
+    Route::put('/plans/{id}', [PlanController::class, 'update']);
+    Route::delete('/plans/{id}', [PlanController::class, 'destroy']);
 });
