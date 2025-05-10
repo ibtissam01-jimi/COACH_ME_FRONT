@@ -36,7 +36,7 @@ class AuthController extends Controller
         
         // Création de l'utilisateur
         $userData = $request->only([
-            'nom', 'prenom', 'email', 'dateNaissance', 'telephone', 'adresse', 'genre', 'statut', 'situation_familliale'
+            'nom', 'prenom', 'email', 'dateNaissance', 'telephone', 'adresse', 'genre', 'statut', 'situation_familliale','role'
         ]);
         $userData['password'] = Hash::make($request->password);
         $user = User::create($userData);
