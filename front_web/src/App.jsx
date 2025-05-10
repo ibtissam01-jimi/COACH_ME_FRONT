@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Route, Routes ,BrowserRouter } from 'react-router-dom'
+import Register from './pages/register'
+import Login from './pages/Login'
 import './App.css'
 
 function App() {
@@ -8,9 +9,18 @@ function App() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold underline">
+      {/* <h1 className="text-3xl font-bold underline">
     Hello world!
-  </h1>
+  </h1> */}
+      <BrowserRouter>
+      <Routes>
+        {/* Public route */}
+        <Route path="/login" element={<Login />} />
+        <Route path='/register' element={<Register/>} />
+      </Routes>
+      </BrowserRouter>
+
+
     </>
   )
 }
