@@ -107,33 +107,46 @@ class UserController extends Controller
             // Hash du mot de passe
             $validated['password'] = Hash::make($validated['password']);
             
-            // Création de l'utilisateur
-            $user = User::create($validated);
+            // Création de l'utilisateur avec les champs de base
+            $userFields = [
+                'nom', 'prenom', 'telephone', 'adresse', 'photo', 'dateNaissance',
+                'genre', 'statut', 'situation_familliale', 'email', 'password', 'role'
+            ];
+            $userData = array_intersect_key($validated, array_flip($userFields));
+            
+            $user = User::create($userData);
             $user->assignRole($validated['role']);
 
             // Création des profils spécifiques selon le rôle
             switch ($validated['role']) {
                 case 'admin':
-                    Administrateur::create([
-                        'user_id' => $user->id,
-                        'dateEmbauche' => $validated['dateEmbauche']
-                    ]);
+                    if (isset($validated['dateEmbauche'])) {
+                        Administrateur::create([
+                            'user_id' => $user->id,
+                            'dateEmbauche' => $validated['dateEmbauche']
+                        ]);
+                    }
                     break;
                 case 'coach':
-                    Coach::create([
-                        'user_id' => $user->id,
-                        'specialite' => $validated['specialite'],
-                        'biographie' => $validated['biographie']
-                    ]);
+                    if (isset($validated['specialite']) && isset($validated['biographie'])) {
+                        Coach::create([
+                            'user_id' => $user->id,
+                            'specialite' => $validated['specialite'],
+                            'biographie' => $validated['biographie']
+                        ]);
+                    }
                     break;
                 case 'coache':
-                    Coache::create([
-                        'user_id' => $user->id,
-                        'date_debut' => $validated['date_debut']
-                    ]);
+                    if (isset($validated['date_debut'])) {
+                        Coache::create([
+                            'user_id' => $user->id,
+                            'date_debut' => $validated['date_debut']
+                        ]);
+                    }
                     break;
             }
 
+            $user->load('roles');
             $createdUsers[] = [
                 'user' => $user,
                 'roles' => $user->getRoleNames()
