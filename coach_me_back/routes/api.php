@@ -60,7 +60,6 @@ Route::middleware(['auth:sanctum', 'role:admin,coach'])->group(function () {
     // Gestion des ressources des plans
     Route::post('/plans/{planId}/ressources', [PlanRessourceController::class, 'attachResources']);
     Route::delete('/plans/{planId}/ressources', [PlanRessourceController::class, 'detachResources']);
-});
 
     
         // Routes des objectifs
