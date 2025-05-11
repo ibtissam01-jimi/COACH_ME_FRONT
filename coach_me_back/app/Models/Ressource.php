@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ressource extends Model
 {
-    protected $fillable = ['titre', 'type', 'url', 'estPremium', 'is_individual', 'prix'];
+    protected $fillable = ['titre', 'type', 'url', 'estPremium', 'is_individual', 'prix', 'photo'];
 
     public function plans()
     {
