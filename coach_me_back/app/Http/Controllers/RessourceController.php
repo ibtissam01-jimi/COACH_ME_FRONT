@@ -73,8 +73,14 @@ class RessourceController extends Controller
                 'url' => 'required|string',
                 'estPremium' => 'sometimes|boolean',
                 'is_individual' => 'required|boolean',
-                'prix' => 'nullable|numeric'
+                'prix' => 'nullable|numeric',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
+
+            if (isset($ressourceData['photo']) && $ressourceData['photo']->isValid()) {
+                $photoPath = $ressourceData['photo']->store('ressources/photos', 'public');
+                $ressourceData['photo'] = $photoPath;
+            }
             
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
