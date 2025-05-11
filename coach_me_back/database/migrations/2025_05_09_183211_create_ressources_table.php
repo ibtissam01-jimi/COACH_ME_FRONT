@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('is_individual')->default(true);
             $table->float('prix')->nullable();
             $table->string('photo')->nullable();
+
             $table->timestamps();
         });
     }
