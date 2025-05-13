@@ -70,6 +70,23 @@ class UserSeeder extends Seeder
         ]);
         $coache->assignRole($coacheRole);
 
+        $coache = User::create([
+            'nom' => 'el jomi',
+            'prenom' => 'ibtissam',
+            'email' => 'eljomiibtissam@gmail.com',
+            'password' => Hash::make('password'),
+            'dateNaissance' => '1995-10-20',
+            'telephone' => '0600000002',
+            'adresse' => '789 Rue Coaché',
+            'genre' => 'Homme',
+            'photo' => 'https://example.com/default-coache.jpg',
+            'statut' => 'Actif',
+            'situation_familliale' => 'Célibataire',
+            'role' => 'coache',
+            'email_verified_at' => now()
+        ]);
+        $coache->assignRole($coacheRole);
+
         // Création de quelques utilisateurs aléatoires
         User::factory(5)->create()->each(function ($user) use ($coacheRole) {
             $user->assignRole($coacheRole);

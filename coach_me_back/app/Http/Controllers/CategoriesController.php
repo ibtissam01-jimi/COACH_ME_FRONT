@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categorie;
+use App\Models\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CategorieController extends Controller
+class CategoriesController extends Controller
 {
     /**
      * Afficher toutes les catégories
      */
     public function index()
     {
-        $categories = Categorie::all();
+        $categories = Categories::all();
         return response()->json($categories, 200);
     }
 
@@ -37,7 +37,7 @@ class CategorieController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $categorie = Categorie::create($categorieData);
+            $categorie = Categories::create($categorieData);
             $createdCategories[] = $categorie;
         }
 
@@ -52,7 +52,7 @@ class CategorieController extends Controller
      */
     public function show($id)
     {
-        $categorie = Categorie::find($id);
+        $categorie = Categories::find($id);
 
         if (!$categorie) {
             return response()->json(['message' => 'Catégorie introuvable'], 404);
@@ -66,7 +66,7 @@ class CategorieController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $categorie = Categorie::find($id);
+        $categorie = Categories::find($id);
 
         if (!$categorie) {
             return response()->json(['message' => 'Catégorie introuvable'], 404);
@@ -92,11 +92,11 @@ class CategorieController extends Controller
         // Si on reçoit des IDs dans le corps de la requête
         $ids = $request->input('ids', []);
         if (!empty($ids)) {
-            $categories = Categorie::whereIn('id', $ids)->get();
+            $categories = Categories::whereIn('id', $ids)->get();
         } 
         // Si on reçoit un ID dans l'URL
         else if ($id) {
-            $categories = collect([Categorie::findOrFail($id)]);
+            $categories = collect([Categories::findOrFail($id)]);
         } else {
             return response()->json(['message' => 'Aucune catégorie spécifiée'], 400);
         }

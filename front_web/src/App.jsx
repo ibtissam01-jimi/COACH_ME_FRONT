@@ -9,6 +9,8 @@ import EditRessource from './pages/editRessource'
 import PlanList from './lists/planList'
 import AddPlan from './pages/addPlan'
 import EditPlan from './pages/editPlan'
+import CategorieList from './lists/CategorieList'
+import AddCategorie from './pages/addCategorie'
 import './App.css'
 
 function App() {
@@ -30,7 +32,10 @@ function App() {
         <Route path='/editRessource/:id' element={<EditRessource/>} />
         <Route path='/plans' element={<PlanList/>} />
         <Route path='/addPlan' element={<AddPlan/>} />
-         <Route path="/editPlan/:id" element={<EditPlan />} />
+        <Route path="/editPlan/:id" element={<EditPlan />} />
+        <Route path='/categories' element={<CategorieList/>} />
+         <Route path='/addCategorie' element={<AddCategorie/>} />
+
 
 
       </Routes>

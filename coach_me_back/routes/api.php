@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ObjectifController;
@@ -87,6 +88,18 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
             'permissions' => $user->getAllPermissions(),
         ]);
     });
+
+
+
+
+ 
+    Route::get('/categories', [CategoriesController::class, 'index']);
+    Route::get('/categories/{id}', [CategoriesController::class, 'show']);
+    Route::post('/categories', [CategoriesController::class, 'store']);
+    Route::put('/categories/{id}', [CategoriesController::class, 'update']);
+    Route::delete('/categories/{id?}', [CategoriesController::class, 'destroy']);
+
+
 
     // Routes de gestion des plans (admin uniquement)
     Route::post('/plans', [PlanController::class, 'store']);
