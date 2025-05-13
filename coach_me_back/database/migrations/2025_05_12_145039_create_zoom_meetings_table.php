@@ -13,7 +13,10 @@ return new class extends Migration
             $table->string('topic');
             $table->datetime('start_time');
             $table->integer('duration');
-            $table->foreignKey('host_id')->references('id')->on('coaches')->onDelete('cascade');
+            $table->unsignedBigInteger('host_id');
+            $table->unsignedBigInteger('guest_id');
+            $table->foreign('host_id')->references('id')->on('coaches')->onDelete('cascade');
+            $table->foreign('guest_id')->references('id')->on('coachees')->onDelete('cascade');
             $table->string('meeting_id')->nullable()->unique();
             $table->string('join_url')->nullable();
             $table->string('password')->nullable();

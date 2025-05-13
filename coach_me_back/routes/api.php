@@ -21,7 +21,7 @@ use App\Models\Coach;
 use App\Models\Coache;
 use App\Http\Controllers\ZoomController;
 
-Route::prefix('zoom')->group(function () {
+Route::prefix('zoom')->middleware('auth:sanctum')->group(function () {
     Route::get('/token', [ZoomController::class, 'getJWT']);
     Route::post('/meetings', [ZoomController::class, 'createMeeting']);
     Route::get('/meetings/{meetingId}/join', [ZoomController::class, 'joinMeeting']);

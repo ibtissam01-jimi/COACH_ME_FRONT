@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use App\Models\ZoomMeeting;
+use App\Models\Coach;
+use App\Models\Coache;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
 class ZoomController extends Controller
@@ -49,21 +52,40 @@ class ZoomController extends Controller
 
     public function createMeeting(Request $request)
     {
+        // Vérifier si l'utilisateur connecté est un coach
+        $user = Auth::user();
+        $coach = Coach::where('user_id', $user->id)->first();
+
+        if (!$coach) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seul un coach peut créer une réunion'
+            ], 403);
+        }
+
         $request->validate([
             'topic' => 'required|string',
             'start_time' => 'required|date',
             'duration' => 'required|integer|min:15',
-            'host_id' => 'required|string'
+            'guest_id' => 'required|exists:coachees,id'
         ]);
 
         try {
+            // Vérifier que le coaché existe
+            $coache = Coache::findOrFail($request->guest_id);
+
             $meeting = ZoomMeeting::create([
                 'topic' => $request->topic,
                 'start_time' => $request->start_time,
                 'duration' => $request->duration,
-                'host_id' => $request->host_id,
-                'status' => 'scheduled'
+                'host_id' => $coach->id, // Utiliser l'ID du coach authentifié
+                'guest_id' => $request->guest_id,
+                'status' => 'scheduled',
+                'password' => \Str::random(6),
             ]);
+
+            // Charger les relations
+            $meeting->load(['host', 'guest']);
 
             return response()->json([
                 'success' => true,
@@ -73,7 +95,7 @@ class ZoomController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create meeting: ' . $e->getMessage()
+                'message' => 'Échec de la création de la réunion : ' . $e->getMessage()
             ], 500);
         }
     }
@@ -81,7 +103,8 @@ class ZoomController extends Controller
     public function joinMeeting(Request $request, $meetingId)
     {
         try {
-            $meeting = ZoomMeeting::where('id', $meetingId)->firstOrFail();
+            $meeting = ZoomMeeting::with(['host', 'guest'])->findOrFail($meetingId);
+            $user = Auth::user();
             
             // Vérifier si la réunion peut être rejointe
             if ($meeting->status !== 'scheduled' && $meeting->status !== 'started') {
@@ -89,6 +112,26 @@ class ZoomController extends Controller
                     'success' => false,
                     'message' => 'Cette réunion ne peut pas être rejointe actuellement'
                 ], 400);
+            }
+
+            // Vérifier les permissions
+            $coach = Coach::where('user_id', $user->id)->first();
+            $coache = Coache::where('user_id', $user->id)->first();
+
+            $isHost = $coach && $coach->id === $meeting->host_id;
+            $isGuest = $coache && $coache->id === $meeting->guest_id;
+
+            if (!$isHost && !$isGuest) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous n\'êtes pas autorisé à rejoindre cette réunion'
+                ], 403);
+            }
+
+            // Si c'est le coach qui rejoint et que la réunion n'est pas démarrée
+            if ($isHost && $meeting->status === 'scheduled') {
+                $meeting->status = 'started';
+                $meeting->save();
             }
 
             // Générer les informations de connexion
@@ -100,11 +143,19 @@ class ZoomController extends Controller
                     'start_time' => $meeting->start_time,
                     'duration' => $meeting->duration,
                     'status' => $meeting->status,
+                    'host' => $meeting->host ? [
+                        'id' => $meeting->host->id,
+                        'name' => $meeting->host->user->name
+                    ] : null,
+                    'guest' => $meeting->guest ? [
+                        'id' => $meeting->guest->id,
+                        'name' => $meeting->guest->user->name
+                    ] : null
                 ],
                 'signature' => $this->jwt,
                 'sdkKey' => config('zoom.sdk_key'),
-                'userIdentity' => $request->input('user_name', 'Guest ' . uniqid()),
-                'role' => ($meeting->host_id === $request->input('user_id')) ? 1 : 0, // 1 pour host, 0 pour participant
+                'userIdentity' => $user->name,
+                'role' => $isHost ? 1 : 0, // 1 pour host, 0 pour participant
                 'password' => $meeting->password,
                 'lang' => $request->input('lang', 'fr-FR'),
                 'sessionConfig' => [
@@ -120,7 +171,7 @@ class ZoomController extends Controller
                         'enable' => true
                     ],
                     'screen_share' => [
-                        'enable' => true
+                        'enable' => $isHost // Seul le coach peut partager son écran
                     ]
                 ]
             ];

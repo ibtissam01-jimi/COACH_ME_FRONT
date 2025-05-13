@@ -13,6 +13,7 @@ class ZoomMeeting extends Model
         'meeting_id',
         'join_url',
         'host_id',
+        'guest_id',
         'password',
         'status'
     ];
@@ -20,11 +21,14 @@ class ZoomMeeting extends Model
     protected $casts = [
         'start_time' => 'datetime'
     ];
-    public function coach()
+
+    public function host()
     {
         return $this->belongsTo(Coach::class, 'host_id');
     }
-    public function coachees(){
-        return $this->hasMany(Coachee::class, 'meeting_id');
+
+    public function guest()
+    {
+        return $this->belongsTo(Coache::class, 'guest_id');
     }
 }
