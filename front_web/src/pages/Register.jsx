@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../redux/slices/authSlice'; 
@@ -19,25 +21,37 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  
+
+
+
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (password === confirmPassword) {
-      dispatch(register({ name, email, password }));
-    } else {
-      
-      alert("Les mots de passe ne correspondent pas");
-    }
-  };
+  e.preventDefault();
+
+  // Vérification que les mots de passe correspondent
+  if (password === confirmPassword) {
+    // Envoi de 'nom' au lieu de 'name'
+    dispatch(register({
+      nom: name, // Changement ici
+      email, 
+      password, 
+      password_confirmation: confirmPassword
+    }));
+  } else {
+    alert("Les mots de passe ne correspondent pas");
+  }
+};
+
 
   useEffect(() => {
     if (user) {
-      navigate('/view-profile'); 
+      navigate('/view-profile'); // Redirection après l'inscription réussie
     }
   }, [user, navigate]);
 
   return (
     <div className="min-h-screen flex">
-      {/* Right form */}
+      {/* Formulaire côté droit */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
         <div className="w-full max-w-md shadow-lg p-6 rounded-2xl bg-white">
           <div className="text-center">
@@ -48,7 +62,7 @@ const Register = () => {
 
           <div>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name */}
+              {/* Nom */}
               <div className="space-y-1">
                 <Label htmlFor="name">Nom</Label>
                 <div className="relative">
@@ -86,7 +100,7 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Password */}
+              {/* Mot de passe */}
               <div className="space-y-1">
                 <Label htmlFor="password">Mot de passe</Label>
                 <div className="relative">
@@ -105,7 +119,7 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Confirm Password */}
+              {/* Confirmer le mot de passe */}
               <div className="space-y-1">
                 <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
                 <div className="relative">
@@ -124,7 +138,7 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Remember me */}
+              {/* Se souvenir de moi */}
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center space-x-2">
                   <Checkbox id="remember" />
@@ -132,7 +146,7 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Error message */}
+              {/* Message d'erreur */}
               {isError && (
                 <div className="text-sm text-red-500 flex items-center gap-2 bg-red-50 p-2 rounded-md border border-red-200">
                   <Icon icon="mdi:alert-circle" className="text-lg" />
@@ -140,7 +154,7 @@ const Register = () => {
                 </div>
               )}
 
-              {/* Submit */}
+              {/* Bouton de soumission */}
               <Button
                 type="submit"
                 className="w-full mt-4 cursor-pointer"
@@ -154,7 +168,7 @@ const Register = () => {
         </div>
       </div>
 
-      {/* Left image */}
+      {/* Image côté gauche */}
       <div className="hidden lg:flex w-1/2 items-center justify-center bg-muted">
         <img src="/assets/images/auth/auth2.jpg" alt="Illustration" className="object-cover max-h-full" />
       </div>
@@ -163,6 +177,3 @@ const Register = () => {
 };
 
 export default Register;
-
-
-

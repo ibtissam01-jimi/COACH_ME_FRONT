@@ -69,6 +69,10 @@ class AuthController extends Controller
         ]);
     }
 
+
+    
+
+
     // Connexion des utilisateurs
     public function login(Request $request)
     {

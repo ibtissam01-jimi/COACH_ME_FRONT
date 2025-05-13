@@ -10,6 +10,6 @@ class Plan extends Model
 
     public function ressources()
     {
-        return $this->belongsToMany(Ressource::class, 'plan_ressource');
+        return $this->belongsToMany(Ressource::class, 'plan_ressources');
     }
 }
