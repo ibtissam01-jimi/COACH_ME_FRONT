@@ -18,9 +18,20 @@ use App\Models\Feedback;
 use App\Models\Administrateur;
 use App\Models\Coach;
 use App\Models\Coache;
+use App\Http\Controllers\ZoomController;
+
+Route::prefix('zoom')->middleware('auth:sanctum')->group(function () {
+    Route::get('/token', [ZoomController::class, 'getJWT']);
+    Route::post('/meetings', [ZoomController::class, 'createMeeting']);
+    Route::get('/meetings/{meetingId}/join', [ZoomController::class, 'joinMeeting']);
+});
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
