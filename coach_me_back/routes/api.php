@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Middleware\RoleMiddleware;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\AuthController;
@@ -42,9 +41,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/ressources/{id}', [RessourceController::class, 'show']);
     Route::post('/ressources/{id}/purchase', [RessourceController::class, 'purchase'])->middleware('role:coache');
 
-    // Routes pour les plans
+//     // Routes pour les plans
     Route::get('/plans', [PlanController::class, 'index']);
     Route::get('/plans/{id}', [PlanController::class, 'show']);
+    Route::get('/plans/{id}', [PlanController::class, 'getPlanById']);
+
 
     // Routes pour la gestion des ressources des plans
     Route::get('/plans/{planId}/ressources', [PlanRessourceController::class, 'getPlanResources']);
@@ -92,3 +93,4 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::put('/plans/{id}', [PlanController::class, 'update']);
     Route::delete('/plans/{id}', [PlanController::class, 'destroy']);
 });
+

@@ -6,6 +6,8 @@ use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+
+
 class PlanController extends Controller
 {
     public function __construct()
@@ -83,6 +85,18 @@ class PlanController extends Controller
         $plan->update($request->all());
         return response()->json(['message' => 'Plan mis à jour avec succès', 'plan' => $plan], 200);
     }
+
+
+
+    public function getPlanById($id)
+{
+    $plan = Plan::find($id);
+    if (!$plan) {
+        return response()->json(['message' => 'Plan non trouvé'], 404);
+    }
+    return response()->json($plan);
+}
+
 
 
     public function destroy(Request $request, string $id = null)
