@@ -6,7 +6,13 @@ import { Icon } from '@iconify/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -14,17 +20,44 @@ const Register = () => {
 
   const { isLoading, isError, message, user } = useSelector((state) => state.auth);
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    prenom: '',
+    nom: '',
+    email: '',
+    telephone: '',
+    adresse: '',
+    dateNaissance: '',
+    genre: 'Homme',
+    situation_familliale: 'Célibataire',
+    statut: 'Actif',
+    password: '',
+    confirmPassword: '',
+    role: 'coache',
+    date_debut: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (password === confirmPassword) {
-      dispatch(register({ name, email, password }));
+    if (formData.password === formData.confirmPassword) {
+      // Remove confirmPassword before sending to API
+      const { confirmPassword, ...userData } = formData;
+      dispatch(register(userData));
     } else {
-      
       alert("Les mots de passe ne correspondent pas");
     }
   };
@@ -48,18 +81,39 @@ const Register = () => {
 
           <div>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name */}
+              {/* Prénom */}
               <div className="space-y-1">
-                <Label htmlFor="name">Nom</Label>
+                <Label htmlFor="prenom">Prénom</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     <Icon icon="fa:user" />
                   </span>
                   <Input
-                    id="name"
+                    id="prenom"
+                    name="prenom"
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={formData.prenom}
+                    onChange={handleChange}
+                    placeholder="Prénom"
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Nom */}
+              <div className="space-y-1">
+                <Label htmlFor="nom">Nom</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Icon icon="fa:user" />
+                  </span>
+                  <Input
+                    id="nom"
+                    name="nom"
+                    type="text"
+                    value={formData.nom}
+                    onChange={handleChange}
                     placeholder="Nom"
                     className="pl-10"
                     required
@@ -76,10 +130,141 @@ const Register = () => {
                   </span>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleChange}
                     placeholder="Email"
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Téléphone */}
+              <div className="space-y-1">
+                <Label htmlFor="telephone">Téléphone</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Icon icon="mdi:phone" />
+                  </span>
+                  <Input
+                    id="telephone"
+                    name="telephone"
+                    type="tel"
+                    value={formData.telephone}
+                    onChange={handleChange}
+                    placeholder="Téléphone"
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Adresse */}
+              <div className="space-y-1">
+                <Label htmlFor="adresse">Adresse</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Icon icon="mdi:map-marker" />
+                  </span>
+                  <Input
+                    id="adresse"
+                    name="adresse"
+                    type="text"
+                    value={formData.adresse}
+                    onChange={handleChange}
+                    placeholder="Adresse"
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Date de naissance */}
+              <div className="space-y-1">
+                <Label htmlFor="dateNaissance">Date de naissance</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Icon icon="mdi:calendar" />
+                  </span>
+                  <Input
+                    id="dateNaissance"
+                    name="dateNaissance"
+                    type="date"
+                    value={formData.dateNaissance}
+                    onChange={handleChange}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Genre */}
+              <div className="space-y-1">
+                <Label htmlFor="genre">Genre</Label>
+                <Select
+                  value={formData.genre}
+                  onValueChange={(value) => handleSelectChange('genre', value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sélectionnez votre genre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Homme">Homme</SelectItem>
+                    <SelectItem value="Femme">Femme</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Situation familiale */}
+              <div className="space-y-1">
+                <Label htmlFor="situation_familliale">Situation familiale</Label>
+                <Select
+                  value={formData.situation_familliale}
+                  onValueChange={(value) => handleSelectChange('situation_familliale', value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sélectionnez votre situation" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Célibataire">Célibataire</SelectItem>
+                    <SelectItem value="Marié">Marié</SelectItem>
+                    <SelectItem value="Divorcé">Divorcé</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Statut */}
+              <div className="space-y-1">
+                <Label htmlFor="statut">Statut</Label>
+                <Select
+                  value={formData.statut}
+                  onValueChange={(value) => handleSelectChange('statut', value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sélectionnez votre statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Actif">Actif</SelectItem>
+                    <SelectItem value="Inactif">Inactif</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Date de début (for coache role) */}
+              <div className="space-y-1">
+                <Label htmlFor="date_debut">Date de début</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Icon icon="mdi:calendar-start" />
+                  </span>
+                  <Input
+                    id="date_debut"
+                    name="date_debut"
+                    type="date"
+                    value={formData.date_debut}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
@@ -95,9 +280,10 @@ const Register = () => {
                   </span>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                     placeholder="Mot de passe"
                     className="pl-10"
                     required
@@ -114,21 +300,14 @@ const Register = () => {
                   </span>
                   <Input
                     id="confirmPassword"
+                    name="confirmPassword"
                     type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
                     placeholder="Confirmer le mot de passe"
                     className="pl-10"
                     required
                   />
-                </div>
-              </div>
-
-              {/* Remember me */}
-              <div className="flex justify-between items-center text-sm">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" />
-                  <Label htmlFor="remember">Se souvenir de moi</Label>
                 </div>
               </div>
 
@@ -163,6 +342,5 @@ const Register = () => {
 };
 
 export default Register;
-
 
 

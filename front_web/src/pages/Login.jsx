@@ -24,7 +24,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/view-profile');
+      navigate('/users');
     }
   }, [user, navigate]);
 
@@ -120,5 +120,4 @@ const Login = () => {
 };
 
 export default Login;
-
 

@@ -9,6 +9,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),         // 👈 alias pour /src
       '@redux': path.resolve(__dirname, '../redux'), // 👈 alias pour ton dossier redux externe
+      '@shadcn/ui': path.resolve(__dirname, './shadcn/ui'),
     },
   },
   server: {
