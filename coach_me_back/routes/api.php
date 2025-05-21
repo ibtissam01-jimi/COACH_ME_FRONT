@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Middleware\RoleMiddleware;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\AuthController;
@@ -19,9 +18,20 @@ use App\Models\Feedback;
 use App\Models\Administrateur;
 use App\Models\Coach;
 use App\Models\Coache;
+use App\Http\Controllers\ZoomController;
+
+Route::prefix('zoom')->middleware('auth:sanctum')->group(function () {
+    Route::get('/token', [ZoomController::class, 'getJWT']);
+    Route::post('/meetings', [ZoomController::class, 'createMeeting']);
+    Route::get('/meetings/{meetingId}/join', [ZoomController::class, 'joinMeeting']);
+});
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -42,9 +52,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/ressources/{id}', [RessourceController::class, 'show']);
     Route::post('/ressources/{id}/purchase', [RessourceController::class, 'purchase'])->middleware('role:coache');
 
-    // Routes pour les plans
+//     // Routes pour les plans
     Route::get('/plans', [PlanController::class, 'index']);
     Route::get('/plans/{id}', [PlanController::class, 'show']);
+    Route::get('/plans/{id}', [PlanController::class, 'getPlanById']);
+
 
     // Routes pour la gestion des ressources des plans
     Route::get('/plans/{planId}/ressources', [PlanRessourceController::class, 'getPlanResources']);
@@ -92,3 +104,4 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::put('/plans/{id}', [PlanController::class, 'update']);
     Route::delete('/plans/{id}', [PlanController::class, 'destroy']);
 });
+

@@ -1,12 +1,15 @@
+// src/api.js
 import axios from 'axios';
-const apiUrl = import.meta.env.VITE_API_URL;
+
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/';
 
 const api = axios.create({
-  baseURL: apiUrl+'api',
+  baseURL: apiUrl + 'api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-  }
+  },
+  withCredentials: true,
 });
 
 // ➕ Ajouter automatiquement le token d'auth si présent

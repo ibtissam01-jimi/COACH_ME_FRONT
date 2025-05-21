@@ -24,7 +24,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/view-profile');
+      navigate('/plans');
     }
   }, [user, navigate]);
 
@@ -85,7 +85,7 @@ const Login = () => {
                   <Checkbox id="remember" />
                   <Label htmlFor="remember">Se souvenir de moi</Label>
                 </div>
-                <Link to="#" className="text-primary hover:underline">Mot de passe oublié ?</Link>
+                <Link to="/forgot-password" className="text-primary hover:underline">Mot de passe oublié ?</Link>
               </div>
 
               {/* Error message */}
@@ -105,6 +105,8 @@ const Login = () => {
               >
                    {isLoading ? 'Connexion...' : 'Se connecter'}
               </Button>
+
+              <Link to="/register" className="text-primary hover:underline">Creer Compte</Link>
 
             </form>
           </div>
