@@ -19,27 +19,26 @@ class UserController extends Controller
      */
     public function index()
     {
-            $user = auth()->user(); 
+        $user = auth()->user(); 
     
-            if ($user->hasRole('coache')) {
-                
-                $users = [$user]; 
-            } 
-            elseif ($user->hasRole('coach')) {
-                $users = [$user]; 
-            } 
-            elseif ($user->hasRole('admin')) {
-                
-                $users = User::all();
-            } else {
-                
-                return response()->json(['message' => 'Role non autorisé'], 403);
-            }
-            foreach ($users as $user) {
-                $user->photo= $user->photo;
-            }
-            return $users;
-    
+        if ($user->hasRole('coache')) {
+            $users = [$user]; 
+        } 
+        elseif ($user->hasRole('coach')) {
+            $users = [$user]; 
+        } 
+        elseif ($user->hasRole('admin')) {
+            $users = User::all();
+        } else {
+            return response()->json(['message' => 'Role non autorisé'], 403);
+        }
+
+        // Add photo URL to each user
+        foreach ($users as $user) {
+            $user->photo = $user->photo;
+        }
+
+        return $users;
     }
 
     /**
@@ -110,7 +109,7 @@ class UserController extends Controller
             // Création de l'utilisateur avec les champs de base
             $userFields = [
                 'nom', 'prenom', 'telephone', 'adresse', 'photo', 'dateNaissance',
-                'genre', 'statut', 'situation_familliale', 'email', 'password', 'role'
+                'genre', 'statut', 'situation_familliale', 'email', 'password'
             ];
             $userData = array_intersect_key($validated, array_flip($userFields));
             
@@ -164,9 +163,15 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->profile_picture_url = $user->profile_picture_url;
-        return $user;
+        // Load related data based on the role
+        $user->load(['administrateurs', 'coaches', 'coachees']);
+    
+        // Add profile picture URL
+        $user->profile_picture_url = $user->photo ? asset('storage/profile_picture/' . $user->photo) : null;
+    
+        return response()->json($user);
     }
+    
 
     /**
      * Show the form for editing the specified resource.
@@ -212,6 +217,7 @@ class UserController extends Controller
                 case 'coach':
                     $rules['specialite'] = 'required|string|max:100';
                     $rules['biographie'] = 'required|string|max:500';
+                    $rules['dateEmbauche'] = 'required|date';
                     break;
                 case 'coache':
                     $rules['date_debut'] = 'required|date';
@@ -228,96 +234,107 @@ class UserController extends Controller
 
         // Gérer la photo si elle est envoyée
         if ($request->hasFile('photo')) {
+
             $file = $request->file('photo');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->storeAs('profile_picture', $fileName, 'public');
 
-            // Supprimer l'ancienne photo si elle existe
             if ($user->photo && Storage::disk('public')->exists('profile_picture/' . $user->photo)) {
                 Storage::disk('public')->delete('profile_picture/' . $user->photo);
             }
 
             $data['photo'] = $fileName;
+            \Log::info('Photo saved:', ['file_name' => $fileName]);
         } elseif (isset($data['photo']) && base64_decode($data['photo'], true)) {
             $fileName = time() . '_' . uniqid() . '.jpg';
             Storage::disk('public')->put("profile_picture/$fileName", base64_decode($data['photo']));
-            
-            // Supprimer l'ancienne photo si elle existe
+
             if ($user->photo && Storage::disk('public')->exists('profile_picture/' . $user->photo)) {
                 Storage::disk('public')->delete('profile_picture/' . $user->photo);
             }
 
             $data['photo'] = $fileName;
         }
-
         // Hasher le mot de passe si fourni
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
 
-        // Mettre à jour les informations de base de l'utilisateur
-        $user->update($data);
-
         // Gérer le changement de rôle si fourni
-        if (isset($data['role']) && $data['role'] !== $user->roles->first()->name) {
-            // Supprimer les anciens rôles et profils associés
-            Administrateur::where('user_id', $user->id)->delete();
-            Coach::where('user_id', $user->id)->delete();
-            Coache::where('user_id', $user->id)->delete();
+        if (isset($data['role'])) {
+            $currentRole = $user->roles->first()->name;
+            $newRole = $data['role'];
 
-            // Assigner le nouveau rôle
-            $user->syncRoles([$data['role']]);
+            if ($currentRole !== $newRole) {
+                // Supprimer l'ancien profil selon le rôle actuel
+                switch ($currentRole) {
+                    case 'admin':
+                        $user->administrateurs()->delete();
+                        break;
+                    case 'coach':
+                        $user->coaches()->delete();
+                        break;
+                    case 'coache':
+                        $user->coachees()->delete();
+                        break;
+                }
 
-            // Créer le nouveau profil selon le rôle
-            switch ($data['role']) {
-                case 'admin':
-                    Administrateur::create([
-                        'user_id' => $user->id,
-                        'dateEmbauche' => $data['dateEmbauche']
-                    ]);
-                    break;
-                case 'coach':
-                    Coach::create([
-                        'user_id' => $user->id,
-                        'specialite' => $data['specialite'],
-                        'biographie' => $data['biographie']
-                    ]);
-                    break;
-                case 'coache':
-                    Coache::create([
-                        'user_id' => $user->id,
-                        'date_debut' => $data['date_debut']
-                    ]);
-                    break;
-            }
-        } else if ($user->roles->isNotEmpty()) {
-            // Mettre à jour les informations spécifiques au rôle existant
-            switch ($user->roles->first()->name) {
-                case 'admin':
-                    if (isset($data['dateEmbauche'])) {
-                        $user->administrateur()->update(['dateEmbauche' => $data['dateEmbauche']]);
-                    }
-                    break;
-                case 'coach':
-                    $updateData = array_intersect_key($data, array_flip(['specialite', 'biographie']));
-                    if (!empty($updateData)) {
-                        $user->coach()->update($updateData);
-                    }
-                    break;
-                case 'coache':
-                    if (isset($data['date_debut'])) {
-                        $user->coache()->update(['date_debut' => $data['date_debut']]);
-                    }
-                    break;
+                // Créer le nouveau profil selon le nouveau rôle
+                switch ($newRole) {
+                    case 'admin':
+                        Administrateur::create([
+                            'user_id' => $user->id,
+                            'dateEmbauche' => $data['dateEmbauche']
+                        ]);
+                        break;
+                    case 'coach':
+                        Coach::create([
+                            'user_id' => $user->id,
+                            'specialite' => $data['specialite'],
+                            'biographie' => $data['biographie'],
+                            'dateEmbauche' => $data['dateEmbauche']
+                        ]);
+                        break;
+                    case 'coache':
+                        Coache::create([
+                            'user_id' => $user->id,
+                            'date_debut' => $data['date_debut']
+                        ]);
+                        break;
+                }
+
+                // Mettre à jour le rôle dans la table users et dans Spatie
+                $user->role = $newRole; // Update the role column
+                $user->save();
+                $user->syncRoles([$newRole]); // Update Spatie roles
             }
         }
 
-        // Recharger l'utilisateur avec ses relations
-        $user->load('roles');
-        
+        // Mettre à jour les informations de base de l'utilisateur
+        $user->update($data);
+
+        // Mettre à jour les informations spécifiques au rôle si nécessaire
+        if ($user->hasRole('admin') && isset($data['dateEmbauche'])) {
+            $user->administrateurs()->update(['dateEmbauche' => $data['dateEmbauche']]);
+        } elseif ($user->hasRole('coach') && (isset($data['specialite']) || isset($data['biographie']) || isset($data['dateEmbauche']))) {
+            $coachData = array_filter([
+                'specialite' => $data['specialite'] ?? null,
+                'biographie' => $data['biographie'] ?? null,
+                'dateEmbauche' => $data['dateEmbauche'] ?? null
+            ]);
+            if (!empty($coachData)) {
+                $user->coaches()->update($coachData);
+            }
+        } elseif ($user->hasRole('coache') && isset($data['date_debut'])) {
+            $user->coachees()->update(['date_debut' => $data['date_debut']]);
+        }
+
+        // Charger les relations pour la réponse
+        $user->load(['administrateurs', 'coaches', 'coachees', 'roles']);
+
         return response()->json([
             'message' => 'Utilisateur mis à jour avec succès',
-            'user' => $user
+            'data' => $user
         ]);
     }
 

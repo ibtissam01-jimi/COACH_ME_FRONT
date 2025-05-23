@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
+use App\Models\Abonnement;
+use App\Models\Ressource;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,7 +21,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorieSeeder::class,
             PlanSeeder::class,
-            RessourceSeeder::class
+            RessourceSeeder::class,
+            AbonnementSeeder::class,
+            PaiementSeeder::class
         ]);
     }
 }

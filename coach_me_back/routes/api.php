@@ -13,15 +13,29 @@ use App\Http\Controllers\ObjectifController;
 use App\Http\Controllers\SousObjectifController;
 use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\PlanRessourceController;
 use App\Http\Controllers\AbonnementController;
 use App\Models\Feedback;
 use App\Models\Administrateur;
 use App\Models\Coach;
 use App\Models\Coache;
+use App\Http\Controllers\ZoomController;
+
+Route::prefix('zoom')->middleware('auth:sanctum')->group(function () {
+    Route::get('/token', [ZoomController::class, 'getJWT']);
+    Route::post('/meetings', [ZoomController::class, 'createMeeting']);
+    Route::get('/meetings/{meetingId}/join', [ZoomController::class, 'joinMeeting']);
+
+
+});
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -30,19 +44,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users', [UserController::class, 'store']); 
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
+  
+
 
     Route::get('/feedbacks', [FeedbackController::class, 'index']);
     Route::post('/feedbacks', [FeedbackController::class, 'store']);
 
     
-    Route::put('/abonnements/{id}', [AbonnementController::class, 'update']);
-
+  
     // Routes pour les ressources
     Route::get('/ressources', [RessourceController::class, 'index']);
     Route::get('/ressources/{id}', [RessourceController::class, 'show']);
     Route::post('/ressources/{id}/purchase', [RessourceController::class, 'purchase'])->middleware('role:coache');
 
-//     // Routes pour les plans
+
+
+
+    
+
+    
+   // Routes pour les plans
     Route::get('/plans', [PlanController::class, 'index']);
     Route::get('/plans/{id}', [PlanController::class, 'show']);
     Route::get('/plans/{id}', [PlanController::class, 'getPlanById']);
@@ -105,5 +126,28 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('/plans', [PlanController::class, 'store']);
     Route::put('/plans/{id}', [PlanController::class, 'update']);
     Route::delete('/plans/{id}', [PlanController::class, 'destroy']);
+
 });
 
+
+
+
+    Route::get('/abonnements', [AbonnementController::class, 'index']);
+    Route::post('/abonnements', [AbonnementController::class, 'store']);
+    Route::get('/abonnements/{id}', [AbonnementController::class, 'show']);
+    Route::put('/abonnements/{id}', [AbonnementController::class, 'update']);
+    Route::delete('/abonnements/{id}', [AbonnementController::class, 'destroy']);
+    
+
+
+    
+
+    Route::get('/paiements', [PaiementController::class, 'index']);         // accessible aux rôles admin et coache
+    Route::post('/paiements', [PaiementController::class, 'store']);        // accessible au rôle coache uniquement
+    Route::put('/paiements/{id}', [PaiementController::class, 'update']);   // accessible aux rôles admin et coache
+    Route::delete('/paiements/{id}', [PaiementController::class, 'destroy']); // admin ou coache
+    Route::get('/paiements/{id}', [PaiementController::class, 'show']);
+
+
+
+    Route::get('/coachs', [UserController::class, 'getCoachs']);

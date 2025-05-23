@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PaiementController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('role:admin|coache')->only(['index', 'update']);
-        $this->middleware('role:coache')->only(['store']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('role:admin|coache')->only(['index', 'update']);
+    //     $this->middleware('role:coache')->only(['store']);
+    // }
 
     public function index()
     {
@@ -21,10 +21,21 @@ class PaiementController extends Controller
         return response()->json($paiements, 200);
     }
 
+
+    public function show($id)
+{
+    $paiement = Paiement::find($id);
+    if (!$paiement) {
+        return response()->json(['message' => 'Paiement introuvable'], 404);
+    }
+    return response()->json($paiement, 200);
+}
+
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
+            // 'user_id' => 'required|exists:users,id',
             'ressource_id' => 'nullable|exists:ressources,id',
             'montant' => 'required|numeric',
             'date_paiement' => 'required|date',
@@ -59,4 +70,18 @@ class PaiementController extends Controller
         $paiement->update(['statut' => $request->statut]);
         return response()->json(['message' => 'Statut de paiement mis à jour', 'paiement' => $paiement], 200);
     }
+
+
+    public function destroy($id)
+{
+    $paiement = Paiement::find($id);
+
+    if (!$paiement) {
+        return response()->json(['message' => 'Paiement introuvable'], 404);
+    }
+
+    $paiement->delete();
+    return response()->json(['message' => 'Paiement supprimé avec succès'], 200);
+}
+
 }

@@ -1,4 +1,132 @@
 
+// import React, { useEffect } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { fetchRessources, deleteRessources } from '../redux/slices/ressourceSlice';
+// import { useNavigate } from 'react-router-dom';
+
+
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from '@/components/ui/table';
+// import { Button } from '@/components/ui/button';
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// import { Loader2 } from 'lucide-react';
+
+// const RessourcesTable = () => {
+//   const dispatch = useDispatch();
+//   const { ressources, loading, error, message } = useSelector((state) => state.ressources);
+
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     dispatch(fetchRessources());
+//   }, [dispatch]);
+
+//   useEffect(() => {
+//     if (message) {
+//       alert(message);
+//     }
+//   }, [message]);
+
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center h-64">
+//         <Loader2 className="animate-spin h-8 w-8 text-primary" />
+//         <span className="ml-2">Chargement des ressources...</span>
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="text-red-500 font-semibold text-center mt-4">
+//         Erreur : {error}
+//       </div>
+//     );
+//   }
+
+//   const handleDelete = (id) => {
+//     if (window.confirm("Voulez-vous vraiment supprimer cette ressource ?")) {
+//       dispatch(deleteRessources([id]));
+//     }
+//   };
+
+//   const handleAdd = () => {
+//     navigate('/addRessource');
+//   };
+
+//   const handleEdit = (id) => {
+//     navigate(`/editRessource/${id}`);
+//   };
+
+//   return (
+//     <Card className="mt-6">
+     
+//       <div className="flex justify-between items-center mb-4">
+//         <h2 className="text-2xl font-semibold">Liste des ressources</h2>
+//         <Button onClick={handleAdd}>Ajouter une ressource</Button>
+//       </div>
+//       <CardContent>
+//         <Table>
+//           <TableHeader>
+//             <TableRow>
+//               <TableHead>ID</TableHead>
+//               <TableHead>Titre</TableHead>
+//               <TableHead>Type</TableHead>
+//               <TableHead>URL</TableHead>
+//               <TableHead>Est Premium</TableHead>
+//               <TableHead>Individuel</TableHead>
+//               <TableHead>Prix</TableHead>
+//               <TableHead>Actions</TableHead>
+//             </TableRow>
+//           </TableHeader>
+//           <TableBody>
+//             {ressources.length > 0 ? (
+//               ressources.map((ressource) => (
+//                 <TableRow key={ressource.id}>
+//                   <TableCell>{ressource.id}</TableCell>
+//                   <TableCell>{ressource.titre}</TableCell>
+//                   <TableCell>{ressource.type}</TableCell>
+//                   <TableCell>
+//                     <a href={ressource.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+//                       {ressource.url}
+//                     </a>
+//                   </TableCell>
+//                   <TableCell>{ressource.estPremium ? 'Oui' : 'Non'}</TableCell>
+//                   <TableCell>{ressource.is_individual ? 'Oui' : 'Non'}</TableCell>
+//                   <TableCell>{ressource.prix ? `${ressource.prix} €` : 'Gratuit'}</TableCell>
+//                   <TableCell className="space-x-2">
+//                     <Button onClick={() => handleEdit(ressource.id)} size="sm">Modifier</Button>
+//                     <Button onClick={() => handleDelete(ressource.id)} size="sm" variant="destructive">Supprimer</Button>
+//                   </TableCell>
+//                 </TableRow>
+//               ))
+//             ) : (
+//               <TableRow>
+//                 <TableCell colSpan="8" className="text-center text-gray-500">
+//                   Aucune ressource trouvée.
+//                 </TableCell>
+//               </TableRow>
+//             )}
+//           </TableBody>
+//         </Table>
+//       </CardContent>
+//     </Card>
+//   );
+// };
+
+// export default RessourcesTable;
+
+
+
+
+
+
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRessources, deleteRessources } from '../redux/slices/ressourceSlice';
@@ -13,8 +141,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import {  Edit, Trash } from "lucide-react";
 
 const RessourcesTable = () => {
   const dispatch = useDispatch();
@@ -64,15 +192,21 @@ const RessourcesTable = () => {
   };
 
   return (
-    <Card className="mt-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Liste des ressources</h2>
-        <Button onClick={handleAdd}>Ajouter une ressource</Button>
+    <div className="bg-slate-50 min-h-screen p-10">
+      <div className="flex justify-between items-center mb-8 px-8 max-w-full">
+        <h2 className="text-3xl font-bold text-slate-800">Liste des ressources</h2>
+        <Button
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow"
+          onClick={handleAdd}
+        >
+          Ajouter une ressource
+        </Button>
       </div>
-      <CardContent>
-        <Table>
+
+      <div className="bg-white rounded-xl shadow-lg overflow-x-auto border border-gray-200 mx-8">
+        <Table className="w-full min-w-[900px]">
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-slate-50">
               <TableHead>ID</TableHead>
               <TableHead>Titre</TableHead>
               <TableHead>Type</TableHead>
@@ -80,27 +214,56 @@ const RessourcesTable = () => {
               <TableHead>Est Premium</TableHead>
               <TableHead>Individuel</TableHead>
               <TableHead>Prix</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {ressources.length > 0 ? (
-              ressources.map((ressource) => (
-                <TableRow key={ressource.id}>
-                  <TableCell>{ressource.id}</TableCell>
-                  <TableCell>{ressource.titre}</TableCell>
-                  <TableCell>{ressource.type}</TableCell>
-                  <TableCell>
-                    <a href={ressource.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+              ressources.map((ressource, index) => (
+                <TableRow
+                  key={ressource.id}
+                  className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50 hover:bg-blue-50 transition'}
+                >
+                  <TableCell className="font-semibold text-slate-800">{ressource.id}</TableCell>
+                  <TableCell className="text-slate-700">{ressource.titre}</TableCell>
+                  <TableCell className="text-slate-700">{ressource.type}</TableCell>
+                  <TableCell className="text-blue-600 hover:underline">
+                    <a href={ressource.url} target="_blank" rel="noopener noreferrer">
                       {ressource.url}
                     </a>
                   </TableCell>
-                  <TableCell>{ressource.estPremium ? 'Oui' : 'Non'}</TableCell>
-                  <TableCell>{ressource.is_individual ? 'Oui' : 'Non'}</TableCell>
-                  <TableCell>{ressource.prix ? `${ressource.prix} €` : 'Gratuit'}</TableCell>
-                  <TableCell className="space-x-2">
-                    <Button onClick={() => handleEdit(ressource.id)} size="sm">Modifier</Button>
-                    <Button onClick={() => handleDelete(ressource.id)} size="sm" variant="destructive">Supprimer</Button>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      ressource.estPremium ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {ressource.estPremium ? 'Oui' : 'Non'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      ressource.is_individual ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {ressource.is_individual ? 'Oui' : 'Non'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-slate-700">{ressource.prix ? `${ressource.prix} €` : 'Gratuit'}</TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(ressource.id)}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Modifier
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(ressource.id)}
+                    >
+                      <Trash className="w-4 h-4 mr-2" />
+                      Supprimer
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -113,10 +276,9 @@ const RessourcesTable = () => {
             )}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
 export default RessourcesTable;
-

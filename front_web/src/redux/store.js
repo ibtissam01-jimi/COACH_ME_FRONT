@@ -1,8 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './slices/authSlice'; // adapte ce chemin
+import authReducer from './slices/authSlice';
 import categoryReducer from './slices/categorieSlice';
 import ressourceReducer from './slices/ressourceSlice';
 import planReducer from './slices/planSlice';
+import abonnementsReducer from './slices/abonnementsSlice';
+import coachReducer from './slices/coachSlice';
+import paiementReducer from './slices/paiementsSlice';
+import userReducer from './slices/userSlice';
 
 const store = configureStore({
   reducer: {
@@ -10,6 +14,10 @@ const store = configureStore({
     ressources: ressourceReducer,
     plans: planReducer,
     categories: categoryReducer,
+    abonnements: abonnementsReducer,
+    coachs: coachReducer,
+    paiement: paiementReducer,
+    users: userReducer,
   },
 });
 

@@ -91,7 +91,7 @@ const EditRessource = () => {
   }
 
   return (
-    <Card className="mt-6">
+    <Card className="w-full max-w-5xl mx-auto mt-10 px-6">
       <CardHeader>
         <CardTitle>Modifier la Ressource</CardTitle>
       </CardHeader>

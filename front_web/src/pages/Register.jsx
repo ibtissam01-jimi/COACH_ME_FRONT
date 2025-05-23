@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../redux/slices/authSlice'; 
@@ -45,7 +43,7 @@ const Register = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/view-profile'); // Redirection après l'inscription réussie
+      navigate('/'); // Redirection après l'inscription réussie
     }
   }, [user, navigate]);
 

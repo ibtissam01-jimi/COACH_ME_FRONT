@@ -9,26 +9,26 @@ use Illuminate\Support\Facades\Auth;
 
 class AbonnementController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('role:admin|coache')->only(['index', 'show']);
-        $this->middleware('role:admin')->only(['store', 'update', 'destroy']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('role:admin|coache')->only(['index', 'show']);
+    //     $this->middleware('role:admin')->only(['store', 'update', 'destroy']);
+    // }
 
     public function index()
     {
         $user = Auth::user();
 
-        if ($user->hasRole('admin')) {
+        // if ($user->hasRole('admin')) {
             return response()->json(Abonnement::with('plan')->get(), 200);
-        }
+        // }
 
-        if ($user->hasRole('coache')) {
-            return response()->json(
-                Abonnement::where('coache_id', $user->id)->with('plan')->get(),
-                200
-            );
-        }
+        // // if ($user->hasRole('coache')) {
+        //     return response()->json(
+        //         Abonnement::where('coache_id', $user->id)->with('plan')->get(),
+        //         200
+        //     );
+        // }
     }
 
     public function store(Request $request)
@@ -37,7 +37,8 @@ class AbonnementController extends Controller
             'coache_id' => 'required|exists:users,id',
             'plan_id' => 'required|exists:plans,id',
             'date_debut' => 'required|date',
-            'statut' => 'required|in:actif,inactif'
+            'date_fin' =>'required|date',
+            'statut' => 'required|in:actif,expire,annule'
         ]);
 
         if ($validator->fails()) {
@@ -57,10 +58,10 @@ class AbonnementController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'coache_id' => 'required|exists:users,id',
             'plan_id' => 'required|exists:plans,id',
             'date_debut' => 'required|date',
-            'statut' => 'required|in:actif,inactif'
+            'date_fin' =>'required|date',
+            'statut' => 'required|in:actif,expire,annule'
         ]);
 
         if ($validator->fails()) {
