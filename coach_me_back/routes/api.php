@@ -47,8 +47,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
   
 
 
-    Route::get('/feedbacks', [FeedbackController::class, 'index']);
-    Route::post('/feedbacks', [FeedbackController::class, 'store']);
+    Route::get('/feedback', [FeedbackController::class, 'index']);
+    Route::post('/feedback', [FeedbackController::class, 'store']);
 
     
   
@@ -151,3 +151,4 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
 
     Route::get('/coachs', [UserController::class, 'getCoachs']);
+     Route::get('/allUsers', [UserController::class, 'allUsers']);

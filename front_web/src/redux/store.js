@@ -7,6 +7,9 @@ import abonnementsReducer from './slices/abonnementsSlice';
 import coachReducer from './slices/coachSlice';
 import paiementReducer from './slices/paiementsSlice';
 import userReducer from './slices/userSlice';
+import feedbackReducer from './slices/feedbackSlice';
+import objectifReducer from './slices/objectifSlice';
+import sousObjectifReducer from './slices/sousObjectifSlice';
 
 const store = configureStore({
   reducer: {
@@ -18,6 +21,9 @@ const store = configureStore({
     coachs: coachReducer,
     paiement: paiementReducer,
     users: userReducer,
+    feedback: feedbackReducer,
+    objectifs: objectifReducer,
+    sousObjectifs:sousObjectifReducer
   },
 });
 

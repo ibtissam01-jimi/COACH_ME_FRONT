@@ -47,54 +47,76 @@ class ObjectifController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $user = Auth::user();
+    // public function store(Request $request)
+    // {
+    //     $user = Auth::user();
 
-        if (!$user->hasRole(['coach', 'coache'])) {
-            return response()->json(['message' => 'Non autorisé'], 403);
-        }
+    //     if (!$user->hasRole(['coach', 'coache'])) {
+    //         return response()->json(['message' => 'Non autorisé'], 403);
+    //     }
 
-        $rules = [
-            'titre' => 'required|string',
-            'statut' => 'in:En cours,Terminé',
-            'progression' => 'numeric|min:0|max:100',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date|after:date_debut',
-        ];
+    //     $rules = [
+    //         'titre' => 'required|string',
+    //         'statut' => 'in:En cours,Terminé',
+    //         'progression' => 'numeric|min:0|max:100',
+    //         'date_debut' => 'required|date',
+    //         'date_fin' => 'required|date|after:date_debut',
+    //     ];
 
-        if ($user->hasRole('coach')) {
-            $rules['dedie_a'] = 'required|exists:users,id';
-            $rules['statut']='prohibited';
+    //     if ($user->hasRole('coach')) {
+    //         $rules['dedie_a'] = 'required|exists:users,id';
+    //         $rules['statut']='prohibited';
             
-            $dedie_a_user = User::find($request->dedie_a);
-            if (!$dedie_a_user) {
-                return response()->json(['message' => 'L\'utilisateur spécifié n\'existe pas'], 422);
-            }
+    //         $dedie_a_user = User::find($request->dedie_a);
+    //         if (!$dedie_a_user) {
+    //             return response()->json(['message' => 'L\'utilisateur spécifié n\'existe pas'], 422);
+    //         }
 
-            if (!$dedie_a_user->hasRole('coache') || $dedie_a_user->hasRole(['admin', 'coach'])) {
-                return response()->json(['message' => 'L\'objectif ne peut être dédié qu\'à un utilisateur ayant uniquement le rôle coaché'], 422);
-            }
-        } else {
-            $rules['dedie_a'] = 'prohibited';
-            $rules['statut'] = 'in:En cours,Terminé';
-        }
+    //         if (!$dedie_a_user->hasRole('coache') || $dedie_a_user->hasRole(['admin', 'coach'])) {
+    //             return response()->json(['message' => 'L\'objectif ne peut être dédié qu\'à un utilisateur ayant uniquement le rôle coaché'], 422);
+    //         }
+    //     } else {
+    //         $rules['dedie_a'] = 'prohibited';
+    //         $rules['statut'] = 'in:En cours,Terminé';
+    //     }
 
-        $validated = $request->validate($rules);
+    //     $validated = $request->validate($rules);
 
-        $objectif = new Objectif();
-        $objectif->titre = $validated['titre'];
-        $objectif->date_debut = $validated['date_debut'];
-        $objectif->date_fin = $validated['date_fin'];
-        $objectif->creer_par = $user->id;
-        $objectif->statut = $user->hasRole('coache') ? $validated['statut'] : 'En cours';
-        $objectif->progression = $validated['progression'] ?? 0;
-        $objectif->dedie_a = $user->hasRole('coach') ? $validated['dedie_a'] : $user->id;
+    //     $objectif = new Objectif();
+    //     $objectif->titre = $validated['titre'];
+    //     $objectif->date_debut = $validated['date_debut'];
+    //     $objectif->date_fin = $validated['date_fin'];
+    //     $objectif->creer_par = $user->id;
+    //     $objectif->statut = $user->hasRole('coache') ? $validated['statut'] : 'En cours';
+    //     $objectif->progression = $validated['progression'] ?? 0;
+    //     $objectif->dedie_a = $user->hasRole('coach') ? $validated['dedie_a'] : $user->id;
 
-        $objectif->save();
+    //     $objectif->save();
 
-        return response()->json($objectif->load(['coach', 'coache']), 201);
-    }
+    //     return response()->json($objectif->load(['coach', 'coache']), 201);
+    // }
+
+
+
+
+    public function store(Request $request)
+{
+    $request->validate([
+        'titre' => 'required|string',
+        'dedie_a' => 'required|exists:users,id',
+    ]);
+
+    $objectif = Objectif::create([
+        'titre' => $request->titre,
+        'dedie_a' => $request->dedie_a,
+        'creer_par' => auth()->id(), // utilisateur connecté
+        'statut' => 'En cours',
+        'progression' => 0,
+    ]);
+
+    return response()->json($objectif, 201);
+}
+
 
     /**
      * Display the specified resource.

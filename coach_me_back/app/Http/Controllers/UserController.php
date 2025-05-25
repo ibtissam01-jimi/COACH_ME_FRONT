@@ -378,4 +378,25 @@ class UserController extends Controller
             'count' => $deletedCount
         ]);
     }
+
+
+
+    
+    public function getCoachs()
+{
+    $coachs = User::role('coach')->select('id', 'nom', 'prenom')->get();
+
+    return response()->json($coachs);
+}
+
+
+
+    public function allUsers()
+{
+    // Récupère tous les utilisateurs
+    $users = User::all();
+
+    // Retourne la liste des utilisateurs en JSON
+    return response()->json($users);
+}
 }

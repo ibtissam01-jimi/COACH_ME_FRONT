@@ -23,7 +23,10 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
             RessourceSeeder::class,
             AbonnementSeeder::class,
-            PaiementSeeder::class
+            PaiementSeeder::class,
+            FeedbackSeeder::class,
+            ObjectifSeeder::class,
+            SousObjectifSeeder::class
         ]);
     }
 }

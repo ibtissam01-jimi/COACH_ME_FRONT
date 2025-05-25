@@ -17,4 +17,10 @@ class Objectif extends Model
     {
         return $this->belongsTo(User::class, 'dedie_a');
     }
+
+    public function sousObjectifs()
+{
+    return $this->hasMany(SousObjectif::class);
+}
+
 }

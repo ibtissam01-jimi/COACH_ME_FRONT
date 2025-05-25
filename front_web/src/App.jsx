@@ -21,12 +21,16 @@ import AddPaiement from './pages/AddPaiement'
 import EditPaiement from './pages/editPaiement'
 
 
-
 import UserList from './pages/users/UserList'
 import UserForm from './pages/users/UserForm'
 import UserDetail from './pages/users/UserDetail'
 import UserProfile from './pages/users/UserProfile'
 
+import CoachObjectivesPage from './pages/Objectifs'
+
+import FeedbackList from './lists/feedbackList'
+
+import ObjectifsList from './lists/ObjectifsList'
 import ProtectedRoute from './components/ProtectedRoute';
 
 import './App.css'
@@ -76,6 +80,15 @@ function App() {
         <Route path="/users/edit/:id" element={<UserForm />} />
         <Route path="/users/:id" element={ <UserDetail /> } />
         <Route path="/profile" element={ <UserProfile />} />
+
+
+
+      
+        {/* <Route path='/objectifs' element={<CoachObjectivesPage/>} /> */}
+        <Route path='/objectifs' element={<ObjectifsList/>} />
+        
+
+         <Route path='/feedbackList' element={<FeedbackList/>} />
 
 
 
