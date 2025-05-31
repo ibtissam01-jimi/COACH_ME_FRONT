@@ -71,8 +71,8 @@ class UserSeeder extends Seeder
         $coache->assignRole($coacheRole);
 
         // Création de quelques utilisateurs aléatoires
-        User::factory(5)->create()->each(function ($user) use ($coacheRole) {
-            $user->assignRole($coacheRole);
-        });
+        // User::factory(5)->create()->each(function ($user) use ($coacheRole) {
+        //     $user->assignRole($coacheRole);
+        // });
     }
 }

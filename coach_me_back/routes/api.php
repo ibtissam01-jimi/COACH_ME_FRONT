@@ -20,6 +20,40 @@ use App\Models\Coach;
 use App\Models\Coache;
 use App\Http\Controllers\ZoomController;
 
+use App\Http\Controllers\StreamChatController;
+
+
+// chat
+Route::middleware('auth:sanctum')->get('/stream/token', [StreamChatController::class, 'token']);
+
+use GetStream\StreamChat\Client;
+
+Route::middleware('auth:sanctum')->post('/stream/upsert-user', function(Request $request) {
+    $user = User::find($request->input('user_id'));
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    $client = new Client(config('stream.key'), config('stream.secret'));
+    $client->upsertUser([
+        'id' => (string)$user->id,
+        'name' => $user->name,
+        'image' => null,
+    ]);
+    return response()->json(['success' => true]);
+});
+
+
+Route::middleware('auth:sanctum')->get('/getusers', function(Request $request) {
+    $user = Auth::user();
+    return User::where('id', '!=', $user->id)->select('id','nom','email')->get();
+});
+
+
+
+
+
+
 Route::prefix('zoom')->middleware('auth:sanctum')->group(function () {
     Route::get('/token', [ZoomController::class, 'getJWT']);
     Route::post('/meetings', [ZoomController::class, 'createMeeting']);
