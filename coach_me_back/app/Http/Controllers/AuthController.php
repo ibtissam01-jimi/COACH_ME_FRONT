@@ -13,66 +13,7 @@ use App\Models\Coache;
 
 class AuthController extends Controller
 {
-    // Inscription des utilisateurs
-    // public function register(Request $request)
-    // {
-    //     $request->validate([
-    //         'nom'     => 'required|string|max:100',
-    //         'prenom'  => 'required|string|max:20',
-    //         'email'    => 'required|email|unique:users',
-    //         'password' => 'required|string|min:6',
-    //         'role' => 'required|in:admin,coach,coache',
-    //         'dateNaissance' => 'required|date',
-    //         'telephone' => 'required|string|max:32',
-    //         'adresse' => 'required|string|max:255',
-    //         'genre' => 'required|in:Homme,Femme',
-    //         'statut' => 'required|in:Actif,Inactif',
-    //         'situation_familliale' => 'required|in:Célibataire,Marié,Divorcé',
-    //         'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    //         'dateEmbauche' => 'required_if:role,admin|date',
-    //         'specialite' => 'required_if:role,coach|string|max:100',
-    //         'biographie' => 'required_if:role,coach|string|max:500',
-    //         'date_debut' => 'required_if:role,coache|date',
-    //     ]);
-        
-    //     // Création de l'utilisateur
-    //     $userData = $request->only([
-    //         'nom', 'prenom', 'email', 'dateNaissance', 'telephone', 'adresse', 'genre', 'statut', 'situation_familliale','role'
-    //     ]);
-    //     $userData['password'] = Hash::make($request->password);
-    //     $user = User::create($userData);
-
-    //     // Assignation du rôle
-    //     $user->assignRole($request->role);
-
-    //     // Création des profils spécifiques
-    //     switch ($request->role) {
-    //         case 'admin':
-    //             Administrateur::create(['user_id' => $user->id, 'dateEmbauche' => $request->dateEmbauche]);
-    //             break;
-    //         case 'coach':
-    //             Coach::create(['user_id' => $user->id, 'specialite' => $request->specialite, 'biographie' => $request->biographie]);
-    //             break;
-    //         case 'coache':
-    //             Coache::create(['user_id' => $user->id, 'date_debut' => $request->date_debut]);
-    //             break;
-    //     }
-
-    //     // Génération du token
-    //     $token = $user->createToken('api-token')->plainTextToken;
-
-    //     return response()->json([
-    //         'message' => 'Inscription réussie',
-    //         'access_token' => $token,
-    //         'token_type' => 'Bearer',
-    //         'user' => $user,
-    //         'roles' => $user->getRoleNames(),
-    //     ]);
-    // }
-
-
-
-
+    
 
     public function register(Request $request)
 {

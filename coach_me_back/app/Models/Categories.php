@@ -12,4 +12,10 @@ class Categories extends Model
 
     // Autorise le champ 'nom' à être inséré ou mis à jour en masse
     protected $fillable = ['nom'];
+
+    public function plans()
+{
+    return $this->hasMany(Plan::class, 'categorie_id');
+}
+
 }

@@ -1,46 +1,55 @@
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api';  // Importation de l'instance axios
+import api from '../api';
 
-// Thunks pour effectuer des appels API
-export const fetchRessources = createAsyncThunk('ressources/fetchAll', async () => {
-  const response = await api.get('/ressources');  // Appel à l'API pour récupérer les ressources
-  return response.data;
+// Thunks
+
+export const fetchRessources = createAsyncThunk('ressources/fetchAll', async (_, { rejectWithValue }) => {
+  try {
+    const response = await api.get('/ressources');
+    return response.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data || err.message);
+  }
 });
 
-export const getRessource = createAsyncThunk('ressources/getOne', async (id) => {
-  const response = await api.get(`/ressources/${id}`);  // Appel pour récupérer une ressource spécifique
-  return response.data;
+export const getRessource = createAsyncThunk('ressources/getOne', async (id, { rejectWithValue }) => {
+  try {
+    const response = await api.get(`/ressources/${id}`);
+    return response.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data || err.message);
+  }
 });
 
 export const createRessource = createAsyncThunk('ressources/create', async (data, { rejectWithValue }) => {
   try {
-    const response = await api.post('/ressources', data);  // Appel pour créer une nouvelle ressource
+    const response = await api.post('/ressources', data);
     return response.data;
   } catch (err) {
-    return rejectWithValue(err.response.data);  // En cas d'erreur, on renvoie l'erreur
+    return rejectWithValue(err.response?.data || err.message);
   }
 });
 
 export const updateRessource = createAsyncThunk('ressources/update', async ({ id, data }, { rejectWithValue }) => {
   try {
-    const response = await api.put(`/ressources/${id}`, data);  // Appel pour mettre à jour une ressource existante
+    const response = await api.put(`/ressources/${id}`, data);
     return response.data;
   } catch (err) {
-    return rejectWithValue(err.response.data);  // Gestion des erreurs
+    return rejectWithValue(err.response?.data || err.message);
   }
 });
 
 export const deleteRessources = createAsyncThunk('ressources/delete', async (ids, { rejectWithValue }) => {
   try {
-    const response = await api.delete('/ressources', { data: { ids } });  // Suppression de ressources
-    return { ids, message: response.data.message };
+    const response = await api.delete('/ressources', { data: { ids } });
+    return { ids, message: response.data.message || "Suppression réussie" };
   } catch (err) {
-    return rejectWithValue(err.response.data);  // En cas d'erreur
+    return rejectWithValue(err.response?.data || err.message);
   }
 });
 
-// Slice des ressources
+// Slice
+
 const ressourceSlice = createSlice({
   name: 'ressources',
   initialState: {
@@ -52,49 +61,98 @@ const ressourceSlice = createSlice({
   },
   reducers: {
     clearMessage(state) {
-      state.message = null;  // Efface les messages
+      state.message = null;
     },
     clearError(state) {
-      state.error = null;  // Efface les erreurs
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
     builder
+      // Fetch all
       .addCase(fetchRessources.pending, (state) => {
-        state.loading = true;  // En attente de la réponse
+        state.loading = true;
+        state.error = null;
+        state.message = null;
       })
       .addCase(fetchRessources.fulfilled, (state, action) => {
         state.loading = false;
-        state.ressources = action.payload;  // Met à jour les ressources
+        state.ressources = action.payload;
       })
       .addCase(fetchRessources.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;  // Gère l'erreur
+        state.error = action.payload || action.error.message;
       })
 
-      // Pour chaque autre action (get, create, update, delete), gérer les états similaires
-
+      // Get one
+      .addCase(getRessource.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
       .addCase(getRessource.fulfilled, (state, action) => {
+        state.loading = false;
         state.selected = action.payload;
       })
+      .addCase(getRessource.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      // Create
+      .addCase(createRessource.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
       .addCase(createRessource.fulfilled, (state, action) => {
-        state.ressources.push(action.payload);  // Ajoute la ressource créée
-        state.message = action.payload.message;
+        state.loading = false;
+        state.ressources.push(action.payload);
+        state.message = action.payload.message || "Ressource créée avec succès";
+      })
+      .addCase(createRessource.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      // Update
+      .addCase(updateRessource.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
       })
       .addCase(updateRessource.fulfilled, (state, action) => {
+        state.loading = false;
         const index = state.ressources.findIndex(r => r.id === action.payload.id);
         if (index !== -1) {
           state.ressources[index] = action.payload;
         }
-        state.message = action.payload.message;
+        state.message = action.payload.message || "Ressource mise à jour";
+      })
+      .addCase(updateRessource.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      // Delete
+      .addCase(deleteRessources.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
       })
       .addCase(deleteRessources.fulfilled, (state, action) => {
+        state.loading = false;
         state.ressources = state.ressources.filter(r => !action.payload.ids.includes(r.id));
-        state.message = action.payload.message;
+        state.message = action.payload.message || "Ressources supprimées";
+      })
+      .addCase(deleteRessources.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
       });
   }
 });
 
 export const { clearMessage, clearError } = ressourceSlice.actions;
 export default ressourceSlice.reducer;
+
 

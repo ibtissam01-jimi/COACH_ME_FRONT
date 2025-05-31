@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -36,9 +38,15 @@ const UserList = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Nouveaux états pour les filtres
+  const [filterName, setFilterName] = useState('');
+  const [filterRole, setFilterRole] = useState('');
+
   useEffect(() => {
+    if(users.length === 0){
     dispatch(fetchUsers());
-  }, [dispatch]);
+    }
+  }, [dispatch, users.length]);
 
   const handleDelete = (id) => {
     setUserToDelete(id);
@@ -78,6 +86,13 @@ const UserList = () => {
     }
   };
 
+  // Filtrage des utilisateurs selon filtres nom et role
+  const filteredUsers = users.filter(user => {
+    const matchName = user.nom.toLowerCase().includes(filterName.toLowerCase());
+    const matchRole = filterRole === '' || user.role === filterRole;
+    return matchName && matchRole;
+  });
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -86,12 +101,48 @@ const UserList = () => {
       <Sidebar />
       <main className="flex-1 w-full px-0 py-10">
         <div className="w-full max-w-full mx-auto">
-          <div className="flex justify-between items-center mb-8 px-8">
-            <h1 className="text-3xl font-bold text-slate-800">Utilisateurs</h1>
+          <div className="flex justify-between items-center mb-4 px-8">
+            <h1 className="text-3xl font-medium text-slate-800">Utilisateurs</h1>
             <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow" onClick={handleAdd}>
               <Plus className="w-4 h-4 mr-2" />
               Ajouter un utilisateur
             </Button>
+          </div>
+          {/* Filtres */}
+          <div className="flex gap-4 mb-6 px-8">
+            <div className="flex items-center gap-2 border border-slate-300  rounded-md shadow-md px-3 py-2 bg-white">
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
+                      />
+                    </svg>
+            <input
+              type="text"
+              placeholder="Rechercher par nom"
+              value={filterName}
+              onChange={(e) => setFilterName(e.target.value)}
+               className="w-full text-gray-700 placeholder-gray-400 focus:outline-none"
+            />
+            </div>
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-1/3"
+            >
+              <option value="">Tous les rôles</option>
+              <option value="admin">Administrateur</option>
+              <option value="coach">Coach</option>
+              <option value="coache">Coache</option>
+            </select>
           </div>
           <div className="bg-white rounded-xl shadow-lg overflow-x-auto border border-gray-200 mx-8">
             <Table className="w-full min-w-[900px]">
@@ -107,7 +158,7 @@ const UserList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                   <TableRow
                     key={user.id}
                     className={user.id % 2 === 0 ? 'bg-white' : 'bg-slate-50 hover:bg-blue-50 transition'}
@@ -125,9 +176,9 @@ const UserList = () => {
                     </TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                        user.role === 'coach' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        user.role === 'admin' ? 'bg-gray-100 text-gray-800' :
+                        user.role === 'coach' ? 'bg-gray-100 text-gray-800' :
+                        'bg-gray-100 text-gray-800'
                       }`}>
                         {user.role === 'admin' ? 'Administrateur' :
                          user.role === 'coach' ? 'Coach' : 'Coache'}
@@ -135,22 +186,19 @@ const UserList = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(user.id)}
-                        >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Modifier
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(user.id)}
-                        >
-                          <Trash className="w-4 h-4 mr-2" />
-                          Supprimer
-                        </Button>
+                          <button
+                            onClick={() => handleEdit(user.id)}
+                            className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                              >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                      
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition"
+                            >
+                            <Trash className="w-4 h-4" />
+                            </button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -187,4 +235,4 @@ const UserList = () => {
   );
 };
 
-export default UserList; 
+export default UserList;

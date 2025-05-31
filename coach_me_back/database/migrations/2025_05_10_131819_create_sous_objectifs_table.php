@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('objectif_id')->constrained('objectifs')->onDelete('cascade');
             $table->string('titre');
             $table->enum('statut', ['En cours', 'Terminé'])->default('En cours');
+            $table->boolean('completed')->default(false); // Champ ajouté
             $table->timestamps();
         });
     }

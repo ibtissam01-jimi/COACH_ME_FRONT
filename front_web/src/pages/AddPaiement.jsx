@@ -11,8 +11,11 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 
 const AddPaiement = () => {
   const dispatch = useDispatch();
@@ -20,14 +23,18 @@ const AddPaiement = () => {
 
   const { ressources } = useSelector((state) => state.ressources);
   const { abonnements } = useSelector((state) => state.abonnements);
+
   const [formData, setFormData] = useState({
     montant: '',
     date_paiement: '',
     methode: '',
     statut: '',
     abonnement_id: '',
-    ressource_id: ''
+    ressource_id: '',
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     dispatch(fetchRessources());
@@ -35,110 +42,178 @@ const AddPaiement = () => {
   }, [dispatch]);
 
   const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
+    setError('');
+    if (field === 'ressource_id') {
+      setFormData((prev) => ({
+        ...prev,
+        ressource_id: value,
+        abonnement_id: '',
+      }));
+    } else if (field === 'abonnement_id') {
+      setFormData((prev) => ({
+        ...prev,
+        abonnement_id: value,
+        ressource_id: '',
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
   };
+
+  const isFormValid =
+    formData.montant &&
+    formData.date_paiement &&
+    formData.methode &&
+    formData.statut &&
+    (formData.abonnement_id || formData.ressource_id);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await dispatch(addPaiement(formData));
-    navigate('/paiements');
+
+    if (!isFormValid) {
+      setError('Veuillez remplir tous les champs requis.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await dispatch(addPaiement(formData)).unwrap();
+      navigate('/paiements');
+    } catch (err) {
+      console.error(err);
+      setError("Une erreur est survenue lors de l’ajout du paiement.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-      <h2 className="text-2xl font-bold mb-6">Ajouter un Paiement</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Montant */}
-        <div>
-          <label className="block font-medium">Montant</label>
-          <Input
-            type="number"
-            value={formData.montant}
-            onChange={(e) => handleChange('montant', e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Date de paiement */}
-        <div>
-          <label className="block font-medium">Date de paiement</label>
-          <Input
-            type="date"
-            value={formData.date_paiement}
-            onChange={(e) => handleChange('date_paiement', e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Méthode */}
-        <div>
-          <label className="block font-medium">Méthode</label>
-          <Select onValueChange={(value) => handleChange('methode', value)} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Méthode de paiement" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cache">Cash</SelectItem>
-              <SelectItem value="virement">Virement</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Statut */}
-        <div>
-          <label className="block font-medium">Statut</label>
-          <Select onValueChange={(value) => handleChange('statut', value)} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner un statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="payé">Payé</SelectItem>
-              <SelectItem value="en attente">En attente</SelectItem>
-              <SelectItem value="annulé">Annulé</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
+    <div className="w-full max-w-3xl mx-auto mt-10 px-6">
+      <Card>
         
+          <CardTitle>Ajouter un Paiement</CardTitle>
+       
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Montant</Label>
+                <Input
+                  type="number"
+                  value={formData.montant}
+                  onChange={(e) => handleChange('montant', e.target.value)}
+                  disabled={loading}
+                  className="focus-visible:ring-blue-500"
+                />
+              </div>
 
-        {/* Ressource */}
-        <div>
-          <label className="block font-medium">Ressource</label>
-          <Select onValueChange={(value) => handleChange('ressource_id', value)} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner une ressource" />
-            </SelectTrigger>
-            <SelectContent>
-              {ressources.map((res) => (
-                <SelectItem key={res.id} value={res.id.toString()}>
-                  {res.titre || `Ressource ${res.id}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              <div>
+                <Label>Date de paiement</Label>
+                <Input
+                  type="date"
+                  value={formData.date_paiement}
+                  onChange={(e) => handleChange('date_paiement', e.target.value)}
+                  disabled={loading}
+                  className="focus-visible:ring-blue-500"
+                />
+              </div>
+            </div>
 
-        {/* Abonnement */}
-        <div>
-          <label className="block font-medium">Abonnement (optionnel)</label>
-          <Select onValueChange={(value) => handleChange('abonnement_id', value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner un abonnement" />
-            </SelectTrigger>
-            <SelectContent>
-              {abonnements.map((ab) => (
-                <SelectItem key={ab.id} value={ab.id.toString()}>
-                  {ab.nom || `Abonnement ${ab.id}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Méthode</Label>
+                <Select
+                  value={formData.methode}
+                  onValueChange={(val) => handleChange('methode', val)}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="focus-visible:ring-blue-500">
+                    <SelectValue placeholder="Sélectionner une méthode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cache">Cash</SelectItem>
+                    <SelectItem value="virement">Virement</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-        <Button type="submit" className="w-full">
-          Ajouter Paiement
-        </Button>
-      </form>
+              <div>
+                <Label>Statut</Label>
+                <Select
+                  value={formData.statut}
+                  onValueChange={(val) => handleChange('statut', val)}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="focus-visible:ring-blue-500">
+                    <SelectValue placeholder="Sélectionner un statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="payé">Payé</SelectItem>
+                    <SelectItem value="en attente">En attente</SelectItem>
+                    <SelectItem value="annulé">Annulé</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Ressource</Label>
+                <Select
+                  value={formData.ressource_id}
+                  onValueChange={(val) => handleChange('ressource_id', val)}
+                  disabled={formData.abonnement_id !== '' || loading}
+                >
+                  <SelectTrigger className="focus-visible:ring-blue-500">
+                    <SelectValue placeholder="Sélectionner une ressource" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ressources.map((res) => (
+                      <SelectItem key={res.id} value={res.id.toString()}>
+                        {res.titre || `Ressource ${res.id}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Abonnement</Label>
+                <Select
+                  value={formData.abonnement_id}
+                  onValueChange={(val) => handleChange('abonnement_id', val)}
+                  disabled={formData.ressource_id !== '' || loading}
+                >
+                  <SelectTrigger className="focus-visible:ring-blue-500">
+                    <SelectValue placeholder="Sélectionner un abonnement" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {abonnements.map((ab) => (
+                      <SelectItem key={ab.id} value={ab.id.toString()}>
+                        {ab.nom || `Abonnement ${ab.id}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {error && <p className="text-red-600 text-sm">{error}</p>}
+
+            <Button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2"
+              disabled={loading}
+            >
+              {loading && <Loader2 className="animate-spin w-4 h-4" />}
+              {loading ? 'Ajout en cours...' : 'Ajouter Paiement'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -12,4 +12,17 @@ class Abonnement extends Model
     {
         return $this->belongsTo(Plan::class);
     }
+
+
+    public function coache()
+{
+    return $this->belongsTo(User::class, 'coache_id');
+}
+
+public function coachChoisi()
+{
+    return $this->belongsTo(User::class, 'coach_choisi_id');
+}
+
+    
 }

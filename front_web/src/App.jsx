@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import { Route, Routes ,BrowserRouter } from 'react-router-dom'
 import Register from './pages/Register'
 import Login from './pages/Login'
@@ -12,6 +13,7 @@ import AddPlan from './pages/addPlan'
 import EditPlan from './pages/editPlan'
 import CategorieList from './lists/CategorieList'
 import AddCategorie from './pages/addCategorie'
+import EditCategorie from './pages/editCategorie'
 import AbonnementList from './lists/AbonnementList'
 import AddAbonnement from './pages/AddAbonnement'
 import EditAbonnement from './pages/editAbonnement'
@@ -63,6 +65,7 @@ function App() {
 
         <Route path='/categories' element={<CategorieList/>} />
         <Route path='/addCategorie' element={<AddCategorie/>} />
+         <Route path="/editCategorie/:id" element={<EditCategorie />} />
 
         <Route path='/abonnements' element={<AbonnementList/>} />
         <Route path='/addAbonnement' element={<AddAbonnement/>} />

@@ -152,3 +152,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     Route::get('/coachs', [UserController::class, 'getCoachs']);
      Route::get('/allUsers', [UserController::class, 'allUsers']);
+
+
+
+    Route::get('/objectifs/{id}', [ObjectifController::class, 'show']);
+    Route::put('/sous-objectifs/{id}/toggle', [SousObjectifController::class, 'toggleCompleted']);

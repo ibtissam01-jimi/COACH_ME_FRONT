@@ -30,11 +30,14 @@ export default function FeedbackList() {
   });
 
   useEffect(() => {
+  if (feedbacks.length === 0) {
     dispatch(fetchFeedbacks());
-    return () => {
-      dispatch(clearFeedbackMessages());
-    };
-  }, [dispatch]);
+  }
+  return () => {
+    dispatch(clearFeedbackMessages());
+  };
+}, [dispatch, feedbacks.length]);
+
 
   const handleRatingClick = (value) => setRating(value);
   const handleRatingHover = (value) => setHoverRating(value);

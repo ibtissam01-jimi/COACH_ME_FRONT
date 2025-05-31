@@ -26,7 +26,8 @@ class DatabaseSeeder extends Seeder
             PaiementSeeder::class,
             FeedbackSeeder::class,
             ObjectifSeeder::class,
-            SousObjectifSeeder::class
+            SousObjectifSeeder::class,
+            PlanRessourceSeeder::class
         ]);
     }
 }

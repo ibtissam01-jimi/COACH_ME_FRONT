@@ -20,7 +20,11 @@ class AbonnementController extends Controller
         $user = Auth::user();
 
         // if ($user->hasRole('admin')) {
-            return response()->json(Abonnement::with('plan')->get(), 200);
+               return response()->json(
+        Abonnement::with(['plan', 'coache'])->get(),
+        200
+    );
+
         // }
 
         // // if ($user->hasRole('coache')) {

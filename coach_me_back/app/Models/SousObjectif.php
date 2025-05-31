@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SousObjectif extends Model
 {
-    protected $fillable = ['objectif_id', 'titre', 'statut'];
+    protected $fillable = ['objectif_id', 'titre', 'statut' , 'completed'];
     protected $table = 'sous_objectifs';
 
     public function objectif()

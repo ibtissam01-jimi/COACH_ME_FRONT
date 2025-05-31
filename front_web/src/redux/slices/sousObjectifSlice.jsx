@@ -18,6 +18,18 @@ export const fetchSousObjectifs = createAsyncThunk(
   }
 );
 
+export const toggleSousObjectifCompleted = createAsyncThunk(
+  'sousObjectifs/toggleCompleted',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.put(`/sous-objectifs/${id}/toggle`);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 
 // Ajouter un sous-objectif
 export const addSousObjectif = createAsyncThunk(
@@ -44,6 +56,8 @@ export const deleteSousObjectif = createAsyncThunk(
     }
   }
 );
+
+
 
 // Modifier un sous-objectif
 export const updateSousObjectif = createAsyncThunk(
@@ -84,6 +98,13 @@ const sousObjectifSlice = createSlice({
       })
       .addCase(deleteSousObjectif.fulfilled, (state, action) => {
         state.data = state.data.filter(sub => sub.id !== action.payload);
+      })
+
+      .addCase(toggleSousObjectifCompleted.fulfilled, (state, action) => {
+        const index = state.data.findIndex((s) => s.id === action.payload.id);
+        if (index !== -1) {
+          state.data[index] = action.payload;
+        }
       })
       .addCase(updateSousObjectif.fulfilled, (state, action) => {
         const index = state.data.findIndex(sub => sub.id === action.payload.id);

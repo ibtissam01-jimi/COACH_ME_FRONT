@@ -12,4 +12,10 @@ class Plan extends Model
     {
         return $this->belongsToMany(Ressource::class, 'plan_ressources');
     }
+
+    public function categorie()
+{
+    return $this->belongsTo(Categories::class, 'categorie_id');
+}
+
 }

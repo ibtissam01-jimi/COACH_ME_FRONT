@@ -15,11 +15,13 @@ class PaiementController extends Controller
     //     $this->middleware('role:coache')->only(['store']);
     // }
 
-    public function index()
-    {
-        $paiements = Paiement::all();
-        return response()->json($paiements, 200);
-    }
+    // PaiementController.php
+public function index()
+{
+    $paiements = Paiement::with('ressource')->get(); // Assurez-vous que la relation est définie dans le modèle
+    return response()->json($paiements);
+}
+
 
 
     public function show($id)
@@ -51,25 +53,47 @@ class PaiementController extends Controller
         return response()->json(['message' => 'Paiement créé avec succès', 'paiement' => $paiement], 201);
     }
 
+
+
+    // public function update(Request $request, $id)
+    // {
+    //     $paiement = Paiement::find($id);
+
+    //     if (!$paiement) {
+    //         return response()->json(['message' => 'Paiement introuvable'], 404);
+    //     }
+
+    //     $validator = Validator::make($request->all(), [
+    //         'statut' => 'required|in:en attente,payé,annulé'
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['errors' => $validator->errors()], 422);
+    //     }
+
+    //     $paiement->update(['statut' => $request->statut]);
+    //     return response()->json(['message' => 'Statut de paiement mis à jour', 'paiement' => $paiement], 200);
+    // }
+
+
     public function update(Request $request, $id)
-    {
-        $paiement = Paiement::find($id);
+{
+    $paiement = Paiement::findOrFail($id);
 
-        if (!$paiement) {
-            return response()->json(['message' => 'Paiement introuvable'], 404);
-        }
+    $paiement->update($request->only([
+        'montant',
+        'date_paiement',
+        'methode',
+        'statut',
+        'abonnement_id',
+        'ressource_id',
+    ]));
 
-        $validator = Validator::make($request->all(), [
-            'statut' => 'required|in:en attente,payé,annulé'
-        ]);
+    return response()->json($paiement);
+}
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
 
-        $paiement->update(['statut' => $request->statut]);
-        return response()->json(['message' => 'Statut de paiement mis à jour', 'paiement' => $paiement], 200);
-    }
+
 
 
     public function destroy($id)

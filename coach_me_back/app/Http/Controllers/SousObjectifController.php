@@ -156,4 +156,14 @@ class SousObjectifController extends Controller
         $sousObjectif->delete();
         return response()->json(['message' => 'Sous-objectif supprimé avec succès']);
     }
+
+    public function toggleCompleted($id)
+{
+    $sousObjectif = SousObjectif::findOrFail($id);
+    $sousObjectif->completed = !$sousObjectif->completed;
+    $sousObjectif->save();
+
+    return response()->json($sousObjectif);
+}
+
 }

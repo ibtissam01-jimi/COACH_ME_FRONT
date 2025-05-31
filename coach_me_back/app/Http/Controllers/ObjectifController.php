@@ -121,10 +121,17 @@ class ObjectifController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Objectif $objectif)
-    {
-        //
-    }
+    public function show($id)
+{
+    $objectif = Objectif::with('sousObjectifs')->findOrFail($id);
+    $progression = $objectif->progression();
+
+    return response()->json([
+        'objectif' => $objectif,
+        'progression' => $progression
+    ]);
+}
+
 
     /**
      * Show the form for editing the specified resource.
@@ -180,7 +187,7 @@ class ObjectifController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->hasRole(['coach', 'coache'])) {
+        if (!$user->hasRole(['coach', 'admin'])) {
             return response()->json(['message' => 'Non autorisé'], 403);
         }
 

@@ -23,4 +23,12 @@ class Objectif extends Model
     return $this->hasMany(SousObjectif::class);
 }
 
+    public function progression()
+{
+    $total = $this->sousObjectifs()->count();
+    $completed = $this->sousObjectifs()->where('completed', true)->count();
+
+    return $total > 0 ? round(($completed / $total) * 100) : 0;
+}
+
 }

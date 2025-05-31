@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Camera } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
@@ -55,7 +56,7 @@ const UserForm = ({ userId, onSuccess, onCancel }) => {
     genre: 'Homme',
     situation_familliale: 'Célibataire',
     statut: 'Actif',
-    role: 'coache',
+    role: 'coache' ||'admin' ||'coach',
     date_debut: '', // For coache role
     biographie: '', // For coach role
     specialite: '', // For coach role
@@ -64,6 +65,8 @@ const UserForm = ({ userId, onSuccess, onCancel }) => {
 
   const [photo, setPhoto] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedRole, setSelectedRole] = useState('');
+
 
   useEffect(() => {
     if (isEditMode && userId) {
@@ -81,7 +84,8 @@ const UserForm = ({ userId, onSuccess, onCancel }) => {
           genre: userToEdit.genre || 'Homme',
           situation_familliale: userToEdit.situation_familliale || 'Célibataire',
           statut: userToEdit.statut || 'Actif',
-          role: userToEdit.role || 'coache',
+          role: userToEdit.role ,
+
           date_debut: userToEdit.date_debut || '',
           biographie: userToEdit.biographie || '',
           specialite: userToEdit.specialite || '',
@@ -176,6 +180,7 @@ const UserForm = ({ userId, onSuccess, onCancel }) => {
           id: userId, 
           formData: formDataToSend 
         })).unwrap();
+       
       } else {
         result = await dispatch(createUser(formDataToSend)).unwrap();
       }
@@ -449,27 +454,30 @@ const UserForm = ({ userId, onSuccess, onCancel }) => {
         </div>
 
         {/* Role */}
-        <div>
-          <Label htmlFor="role">Rôle</Label>
-          <Select
-            value={formData.role}
-            onValueChange={(value) => handleSelectChange('role', value)}
-          >
-            <SelectTrigger className={`w-full mt-1 ${getFieldError('role') ? 'border-red-500' : ''}`}>
-              <SelectValue placeholder="Sélectionnez le rôle" />
-            </SelectTrigger>
-            <SelectContent>
-              {roleOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {getFieldError('role') && (
-            <p className="text-red-500 text-sm mt-1">{getFieldError('role')}</p>
-          )}
-        </div>
+        {/* Rôle */}
+<div>
+  <Label htmlFor="role">Rôle</Label>
+  <Select
+  value={formData.role}
+  onValueChange={(value) => handleSelectChange('role', value)}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Sélectionner un rôle" />
+  </SelectTrigger>
+  <SelectContent>
+    {roleOptions.map((option) => (
+      <SelectItem key={option.value} value={option.value}>
+        {option.label}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+
+  {getFieldError('role') && (
+    <p className="text-red-500 text-sm mt-1">{getFieldError('role')}</p>
+  )}
+</div>
 
         {/* Date de début (for coache role) */}
         {formData.role === 'coache' && (

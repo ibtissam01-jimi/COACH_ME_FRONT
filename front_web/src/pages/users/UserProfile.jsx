@@ -99,7 +99,9 @@ export default function UserProfile() {
         role: user.role || '',
         statut: user.statut || 'Actif',
         date_debut: formatDate(roleData.coache?.date_debut) || '',
-        dateEmbauche: formatDate(roleData.admin?.dateEmbauche || roleData.coach?.dateEmbauche) || '',
+       dateEmbauche: formatDate(roleData.admin?.dateEmbauche || roleData.coach?.dateEmbauche) || '',
+        
+
         specialite: roleData.coach?.specialite || '',
       });
 
@@ -251,6 +253,7 @@ export default function UserProfile() {
                 type="date"
                 value={formData.dateEmbauche}
                 onChange={handleChange}
+                
               />
             </div>
             <div className="space-y-2">
